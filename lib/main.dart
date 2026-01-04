@@ -2,45 +2,56 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'src/auth/auth_controller.dart';
-import 'src/auth/mock_auth_service.dart';
+import 'src/auth/auth_service.dart'; // Gerçek servis
+
+import 'src/ui/main_shell.dart';
 import 'src/ui/screens/onboarding_screen.dart';
 import 'src/ui/screens/login_screen.dart';
 import 'src/ui/screens/register_screen.dart';
-import 'src/ui/screens/home_screen.dart';
+import 'src/theme/app_colors.dart';
 
 void main() {
   runApp(
     MultiProvider(
       providers: [
-        Provider(create: (_) => MockAuthService()),
-        ChangeNotifierProxyProvider<MockAuthService, AuthController>(
-          create: (context) => AuthController(context.read<MockAuthService>()),
-          update: (context, service, controller) => controller!..service = service,
-        ),
+        // Basitçe AuthController'ı sağlıyoruz
+        ChangeNotifierProvider(create: (_) => AuthController()),
       ],
       child: const MyApp(),
     ),
   );
 }
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
+  
+  // ... Geri kalan build metodunuz aynı kalabilir ...
   @override
   Widget build(BuildContext context) {
-    const primary = Color(0xFFFF5A1F); // turuncu
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Zeytin Hastalık Tespit',
       theme: ThemeData(
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: primary),
+        scaffoldBackgroundColor: AppColors.background,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppColors.primary,
+          primary: AppColors.primary,
+          secondary: AppColors.secondary,
+          background: AppColors.background,
+        ),
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
-          fillColor: const Color(0xFFF4F4F4),
+          fillColor: Colors.white,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
             borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: const BorderSide(
+              color: AppColors.primary,
+              width: 2,
+            ),
           ),
         ),
       ),
@@ -49,7 +60,7 @@ class MyApp extends StatelessWidget {
         OnboardingScreen.route: (_) => const OnboardingScreen(),
         LoginScreen.route: (_) => const LoginScreen(),
         RegisterScreen.route: (_) => const RegisterScreen(),
-        HomeScreen.route: (_) => const HomeScreen(),
+        '/main': (_) => const MainShell(),
       },
     );
   }

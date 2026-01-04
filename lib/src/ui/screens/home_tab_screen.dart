@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // 1. BU PAKETİ EKLE
 
 import '../../theme/app_colors.dart';
 import '../../auth/auth_controller.dart';
@@ -19,7 +18,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _email = TextEditingController(text: "emrehasilik38@gmail.com");
+  final _email = TextEditingController(text: "user@test.com");
   final _pass = TextEditingController(text: "123456");
   bool _obscure = true;
 
@@ -34,36 +33,16 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final auth = context.read<AuthController>();
-    // AuthController içindeki login fonksiyonu çalışıyor
     final ok = await auth.login(_email.text, _pass.text);
 
     if (!mounted) return;
 
     if (ok) {
-      // ✅ 2. ID KAYDETME İŞLEMİ BURADA YAPILIYOR
-      try {
-        final prefs = await SharedPreferences.getInstance();
-        
-        // DİKKAT: AuthController içerisinde giriş başarılı olunca 
-        // userId'yi bir değişkene atamış olmalısın.
-        // Örnek: auth.userId veya auth.currentUser?.id gibi.
-        // Eğer AuthController'da bu yoksa oraya eklemelisin.
-        // Şimdilik auth.userId olduğunu varsayarak yazıyorum:
-        
-        if (auth.userId != null) { 
-           await prefs.setString('userId', auth.userId!);
-        } else {
-           debugPrint("Uyarı: AuthController içinde userId boş görünüyor.");
-        }
-      } catch (e) {
-        debugPrint("ID Kaydetme hatası: $e");
-      }
-
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        '/main',
-        (_) => false,
-      );
+     Navigator.pushNamedAndRemoveUntil(
+  context,
+  '/main',
+  (_) => false,
+);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(auth.error ?? "Giriş başarısız")),
